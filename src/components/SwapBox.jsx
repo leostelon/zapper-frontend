@@ -1,12 +1,20 @@
 import "./SwapBox.css";
-import { FaBitcoin, FaEthereum, FaExchangeAlt } from "react-icons/fa";
+import { FaBitcoin, FaEthereum, FaExchangeAlt, FaWallet } from "react-icons/fa";
 import TokenSelector from "./TokenSelector";
 import { useState } from "react";
 import { connectWalletToSite, getWalletAddress } from "../utils/wallet";
 import { getQuote } from "../api/quote";
 import Web3 from "web3";
-import { ZERO_ADDRESS } from "../constants";
+import {
+	ERC20_ABI,
+	SEPOLIA_ESCROW_FACTORY_CA,
+	SEPOLIA_WETH_CA,
+	ZERO_ADDRESS,
+} from "../constants";
 import { useEffect } from "react";
+import { crypto as bjsCrypto } from "bitcoinjs-lib";
+import { createOrder } from "../api/order";
+import { BN } from "bn.js";
 
 const tokens = [
 	{
@@ -37,6 +45,7 @@ export const SwapBox = () => {
 	const [connectedWalletAddress, setConnectedWalletAddress] = useState(null);
 	const [quote, setQuote] = useState(null);
 	const [sendInputAmount, setSendInputAmount] = useState(null);
+	const [sendTokenBalance, setSendTokenBalance] = useState(null);
 
 	const availableForSend = tokens.filter((t) => t.id !== receiveToken?.id);
 	const availableForReceive = tokens.filter((t) => t.id !== sendToken?.id);
@@ -60,6 +69,7 @@ export const SwapBox = () => {
 				enableEstimate,
 			});
 			setQuote(result);
+			return result;
 		} catch (err) {
 			console.error("Error:", err.message);
 		}
@@ -67,7 +77,35 @@ export const SwapBox = () => {
 
 	async function getConnectedWalletAddress() {
 		const wa = await getWalletAddress();
-		setConnectedWalletAddress(wa);
+		if (wa) {
+			setConnectedWalletAddress(wa);
+			const b = await getERC20Balance(wa);
+			setSendTokenBalance(b);
+		}
+	}
+
+	async function checkAndApproveERC20(requiredAmount) {
+		const web3 = new Web3(window.ethereum);
+		const tokenContract = new web3.eth.Contract(ERC20_ABI, SEPOLIA_WETH_CA);
+
+		const currentBalance = await tokenContract.methods
+			.balanceOf(connectedWalletAddress)
+			.call();
+		if (new BN(currentBalance).lt(new BN(requiredAmount)))
+			return alert("Insufficient WETH balance.");
+		const currentAllowance = await tokenContract.methods
+			.allowance(connectedWalletAddress, SEPOLIA_ESCROW_FACTORY_CA)
+			.call();
+		if (new BN(currentAllowance).lt(new BN(requiredAmount))) {
+			console.log("Approving token...");
+			const tx = await tokenContract.methods
+				.approve(SEPOLIA_ESCROW_FACTORY_CA, requiredAmount)
+				.send({ from: connectedWalletAddress });
+			return tx;
+		} else {
+			console.log("Already approved.");
+			return null;
+		}
 	}
 
 	function exchangeTokens() {
@@ -76,8 +114,54 @@ export const SwapBox = () => {
 	}
 
 	async function handleSwap() {
-		const res = await connectWalletToSite();
-		if (res) getConnectedWalletAddress();
+		if (!connectedWalletAddress) {
+			const res = await connectWalletToSite();
+			if (res) getConnectedWalletAddress();
+		} else {
+			const quote = await fetchQuote(true);
+			await checkAndApproveERC20(quote.srcTokenAmount);
+			const preimage = generateRandomHex();
+			const preimageBuffer = Buffer.from(preimage);
+			localStorage.setItem(quote._id, preimage);
+			const hash = bjsCrypto.hash160(preimageBuffer);
+			await handleCreateOrder(hash.toString("hex"), quote._id);
+		}
+	}
+
+	function generateRandomHex(size = 16) {
+		const array = new Uint8Array(size);
+		crypto.getRandomValues(array);
+		return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
+	}
+
+	async function handleCreateOrder(secret_hash, quote_id) {
+		try {
+			const response = await createOrder(secret_hash, quote_id);
+			return response;
+		} catch (err) {
+			console.error("Error:", err.message);
+		}
+	}
+
+	async function getERC20Balance(walletAddress) {
+		const web3 = new Web3(window.ethereum);
+		const contract = new web3.eth.Contract(ERC20_ABI, SEPOLIA_WETH_CA);
+		try {
+			const balance = await contract.methods.balanceOf(walletAddress).call();
+			const humanReadable = web3.utils.fromWei(balance, "ether");
+			return humanReadable;
+		} catch (err) {
+			console.error("Failed to fetch token balance:", err);
+			return null;
+		}
+	}
+
+	function formatTokenAmount(input) {
+		const num = parseFloat(input);
+		if (isNaN(num)) return "0";
+
+		const decimals = num < 1 ? 5 : 3;
+		return Math.floor(num * 10 ** decimals) / 10 ** decimals;
 	}
 
 	useEffect(() => {
@@ -91,19 +175,35 @@ export const SwapBox = () => {
 	return (
 		<div className="swap-box">
 			<div className="swap-section">
-				<p className="label">Send</p>
 				<div className="input-container">
-					<input
-						type="text"
-						placeholder="0"
-						onChange={(v) => setSendInputAmount(v.currentTarget.value)}
-					/>
-					<TokenSelector
-						selected={sendToken}
-						onSelect={setSendToken}
-						exclude={receiveToken}
-						tokens={availableForSend}
-					/>
+					<div style={{ height: "100%" }}>
+						<p
+							className="label"
+							style={{ marginTop: "0", marginBottom: "12px" }}
+						>
+							Send
+						</p>
+						<input
+							type="text"
+							placeholder="0"
+							onChange={(v) => setSendInputAmount(v.currentTarget.value)}
+						/>
+					</div>
+					<div className="token-selector-wrapper">
+						<div className="balance-row">
+							<FaWallet className="balance-icon" />
+							<span className="balance-text">
+								{formatTokenAmount(sendTokenBalance) ?? "0.00"}{" "}
+								{sendToken?.token?.symbol}
+							</span>
+						</div>
+						<TokenSelector
+							selected={sendToken}
+							onSelect={setSendToken}
+							exclude={receiveToken}
+							tokens={availableForSend}
+						/>
+					</div>
 				</div>
 			</div>
 
@@ -119,12 +219,12 @@ export const SwapBox = () => {
 						placeholder="0"
 						value={
 							quote
-								? Math.floor(
+								? formatTokenAmount(
 										Web3.utils.fromWei(
 											quote.dstTokenAmount,
 											sendToken.id === 991 ? "ether" : 8
-										) * 1000
-								  ) / 1000
+										)
+								  )
 								: "0"
 						}
 					/>

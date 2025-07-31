@@ -20,8 +20,7 @@
 
 .input-container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items: self-start;
 }
 
 .input-container input {
@@ -62,4 +61,19 @@
   background: #5a5aff;
   cursor: pointer;
   color: #ffffff;
+}
+
+.balance-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #444;
+  gap: 6px;
+}
+
+.balance-icon {
+  font-size: 16px;
+  color: #888;
 }
