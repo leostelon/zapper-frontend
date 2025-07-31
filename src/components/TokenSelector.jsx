@@ -1,38 +1,24 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./TokenSelector.css";
-import { FaBitcoin, FaAngleDown, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
-const TokenSelector = () => {
+const TokenSelector = ({ selected, onSelect, exclude, tokens }) => {
 	const [showPopup, setShowPopup] = useState(false);
-
-	const tokens = [
-		{
-			chain: "Bitcoin",
-			token: { name: "Bitcoin", symbol: "BTC", icon: <FaBitcoin /> },
-		},
-		{
-			chain: "Solana",
-			token: {
-				name: "Solana",
-				symbol: "SOL",
-				icon: (
-					<img
-						src="https://cryptologos.cc/logos/solana-sol-logo.png"
-						alt="sol"
-						width="18"
-					/>
-				),
-			},
-		},
-	];
+	const filteredTokens = tokens.filter((token) => token.id !== exclude?.id);
+    console.log(filteredTokens, exclude)
 
 	const togglePopup = () => setShowPopup(!showPopup);
 
 	return (
 		<div className="token-selector-wrapper">
 			<div className="select-box" onClick={togglePopup}>
-				<span>BTC</span>
-				<FaAngleDown />
+				{selected ? (
+					<>
+						{selected.token.icon} {selected.token.symbol}
+					</>
+				) : (
+					"Select Token ⬇"
+				)}
 			</div>
 
 			{showPopup && (
@@ -44,14 +30,21 @@ const TokenSelector = () => {
 						</div>
 
 						<div className="token-list">
-							{tokens.map(({ chain, token }, index) => (
-								<div key={index} className="token-item">
-									<div className="token-icon">{token.icon}</div>
+							{filteredTokens.map((t, index) => (
+								<div
+									key={index}
+									className="token-item"
+									onClick={() => {
+										onSelect(t);
+										setShowPopup(false);
+									}}
+								>
+									<div className="token-icon">{t.token.icon}</div>
 									<div className="token-details">
-										<span className="token-name">{token.name}</span>
-										<span className="token-symbol">{token.symbol}</span>
+										<span className="token-name">{t.token.name}</span>
+										<span className="token-symbol">{t.token.symbol}</span>
 									</div>
-									<div className="token-chain">{chain}</div>
+									<div className="token-chain">{t.chain}</div>
 								</div>
 							))}
 						</div>
