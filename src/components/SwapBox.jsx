@@ -1,5 +1,6 @@
 import "./SwapBox.css";
-import { FaBitcoin, FaAngleDown, FaExchangeAlt } from "react-icons/fa";
+import { FaExchangeAlt } from "react-icons/fa";
+import TokenSelector from "./TokenSelector";
 
 export const SwapBox = () => {
 	return (
@@ -8,11 +9,7 @@ export const SwapBox = () => {
 				<p className="label">Send</p>
 				<div className="input-container">
 					<input type="text" placeholder="0" />
-					<div className="token-select">
-						<span>BTC</span>
-						<FaBitcoin />
-						<FaAngleDown />
-					</div>
+					<TokenSelector />
 				</div>
 			</div>
 
@@ -24,10 +21,7 @@ export const SwapBox = () => {
 				<p className="label">Receive</p>
 				<div className="input-container">
 					<input type="text" placeholder="0" />
-					<div className="token-select">
-						<span>Select token</span>
-						<FaAngleDown />
-					</div>
+					<TokenSelector />
 				</div>
 			</div>
 
