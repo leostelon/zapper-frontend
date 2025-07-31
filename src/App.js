@@ -1,8 +1,21 @@
 import "./App.css";
+import { useEffect } from "react";
+import { SwapBox } from "./components/SwapBox";
 
 function App() {
+	async function test() {
+		
+	}
 
-	return <div className="App">Hello</div>;
+	useEffect(() => {
+		test();
+	}, []);
+
+	return (
+		<div className="App">
+			<SwapBox />
+		</div>
+	);
 }
 
 export default App;
