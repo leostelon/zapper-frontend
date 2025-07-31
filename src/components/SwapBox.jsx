@@ -27,6 +27,11 @@ export const SwapBox = () => {
 	const availableForSend = tokens.filter((t) => t.id !== receiveToken?.id);
 	const availableForReceive = tokens.filter((t) => t.id !== sendToken?.id);
 
+	function exchangeTokens() {
+		setSendToken(receiveToken);
+		setReceiveToken(sendToken);
+	}
+
 	return (
 		<div className="swap-box">
 			<div className="swap-section">
@@ -42,7 +47,7 @@ export const SwapBox = () => {
 				</div>
 			</div>
 
-			<div className="divider">
+			<div className="divider" onClick={exchangeTokens}>
 				<FaExchangeAlt />
 			</div>
 

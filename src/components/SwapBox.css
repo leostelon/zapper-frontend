@@ -46,6 +46,7 @@
   margin-bottom: 16px;
   font-size: 18px;
   color: #999;
+  cursor: pointer;
 }
 
 .swap-button {

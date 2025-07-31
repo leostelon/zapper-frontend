@@ -5,7 +5,6 @@ import { FaTimes } from "react-icons/fa";
 const TokenSelector = ({ selected, onSelect, exclude, tokens }) => {
 	const [showPopup, setShowPopup] = useState(false);
 	const filteredTokens = tokens.filter((token) => token.id !== exclude?.id);
-    console.log(filteredTokens, exclude)
 
 	const togglePopup = () => setShowPopup(!showPopup);
 
@@ -26,7 +25,7 @@ const TokenSelector = ({ selected, onSelect, exclude, tokens }) => {
 					<div className="popup" onClick={(e) => e.stopPropagation()}>
 						<div className="popup-header">
 							<span>Select token to send</span>
-							<FaTimes onClick={togglePopup} />
+							<FaTimes onClick={togglePopup} style={{ cursor: "pointer" }} />
 						</div>
 
 						<div className="token-list">
