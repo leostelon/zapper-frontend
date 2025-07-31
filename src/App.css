@@ -1,7 +1,15 @@
+* {
+	box-sizing: border-box;
+}
+
 .App {
+	max-height: 100vh;
+	max-width: 100vw;
+}
+
+.App .body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 100vh;
-	width: 100vw;
+	height: 80vh;
 }

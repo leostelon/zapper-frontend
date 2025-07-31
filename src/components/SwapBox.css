@@ -2,7 +2,6 @@
   background: linear-gradient(145deg, #e0fdfd, #def1f1);
   border-radius: 16px;
   padding: 24px;
-  width: 320px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
@@ -57,5 +56,10 @@
   font-weight: bold;
   border: none;
   border-radius: 12px;
-  cursor: not-allowed;
+}
+
+.swap-button:hover {
+  background: #7272f5;
+  cursor: pointer;
+  color: #ffffff;
 }

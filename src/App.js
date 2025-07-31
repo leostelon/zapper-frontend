@@ -1,11 +1,10 @@
 import "./App.css";
 import { useEffect } from "react";
 import { SwapBox } from "./components/SwapBox";
+import WalletBadge from "./components/WalletBadge";
 
 function App() {
-	async function test() {
-		
-	}
+	async function test() {}
 
 	useEffect(() => {
 		test();
@@ -13,7 +12,10 @@ function App() {
 
 	return (
 		<div className="App">
-			<SwapBox />
+			<WalletBadge />
+			<div className="body">
+				<SwapBox />
+			</div>
 		</div>
 	);
 }

@@ -2,6 +2,7 @@ import "./SwapBox.css";
 import { FaBitcoin, FaEthereum, FaExchangeAlt } from "react-icons/fa";
 import TokenSelector from "./TokenSelector";
 import { useState } from "react";
+import { connectWalletToSite } from "../utils/wallet";
 
 const tokens = [
 	{
@@ -64,7 +65,9 @@ export const SwapBox = () => {
 				</div>
 			</div>
 
-			<button className="swap-button">Swap</button>
+			<button className="swap-button" onClick={connectWalletToSite}>
+				Swap
+			</button>
 		</div>
 	);
 };
