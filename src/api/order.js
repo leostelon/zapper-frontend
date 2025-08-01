@@ -26,3 +26,23 @@ export async function createOrder(secret_hash, quote_id) {
 		throw new Error(error?.response?.data?.message || "Failed to get quote");
 	}
 }
+
+export async function getOrders(walletAddress) {
+	try {
+		const response = await fetch(`${API_BASE_URL}/order/wallet/${walletAddress}`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		if (!response.ok) {
+			const error = await response.json();
+			throw new Error(error.message || "Failed to fetch orders");
+		}
+
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		throw new Error(error?.response?.data?.message || "Failed to fetch orders");
+	}
+}

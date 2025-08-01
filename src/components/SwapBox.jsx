@@ -17,6 +17,7 @@ import { createOrder } from "../api/order";
 import { BN } from "bn.js";
 import Notification from "./Notification";
 import Loader from "./Loader";
+import { formatTokenAmount } from "../utils/formatTokenAmount";
 
 const tokens = [
 	{
@@ -165,20 +166,11 @@ export const SwapBox = () => {
 		const contract = new web3.eth.Contract(ERC20_ABI, SEPOLIA_WETH_CA);
 		try {
 			const balance = await contract.methods.balanceOf(walletAddress).call();
-			const humanReadable = web3.utils.fromWei(balance, "ether");
-			return humanReadable;
+			return balance;
 		} catch (err) {
 			console.error("Failed to fetch token balance:", err);
 			return null;
 		}
-	}
-
-	function formatTokenAmount(input) {
-		const num = parseFloat(input);
-		if (isNaN(num)) return "0";
-
-		const decimals = num < 1 ? 5 : 3;
-		return Math.floor(num * 10 ** decimals) / 10 ** decimals;
 	}
 
 	useEffect(() => {
@@ -217,7 +209,7 @@ export const SwapBox = () => {
 						<div className="balance-row">
 							<FaWallet className="balance-icon" />
 							<span className="balance-text">
-								{formatTokenAmount(sendTokenBalance) ?? "0.00"}{" "}
+								{formatTokenAmount(sendTokenBalance, SEPOLIA_WETH_CA) ?? "0.00"}{" "}
 								{sendToken?.token?.symbol}
 							</span>
 						</div>
@@ -243,12 +235,7 @@ export const SwapBox = () => {
 						placeholder="0"
 						value={
 							quote
-								? formatTokenAmount(
-										Web3.utils.fromWei(
-											quote.dstTokenAmount,
-											sendToken.id === 991 ? "ether" : 8
-										)
-								  )
+								? formatTokenAmount(quote.dstTokenAmount, quote.dstTokenAddress)
 								: "0"
 						}
 					/>

@@ -5,23 +5,33 @@ import {
 	switchChain,
 } from "../utils/wallet";
 import "./WalletBadge.css";
-import { FaEthereum, FaSignOutAlt } from "react-icons/fa";
+import {
+	FaBitcoin,
+	FaDollarSign,
+	FaEthereum,
+	FaSignOutAlt,
+} from "react-icons/fa";
 import { ERC20_ABI, SEPOLIA_WETH_CA } from "../constants";
 import Web3 from "web3";
 import Loader from "./Loader";
 import Notification from "./Notification";
 import SideDrawer from "./SideDrawer";
+import TransactionTile from "./TransactionTile";
+import { getOrders } from "../api/order";
+import { formatTokenAmount } from "../utils/formatTokenAmount";
 
 const WalletBadge = () => {
 	const [address, setaddress] = useState(null);
 	const [swapLoading, setSwapLoading] = useState(false);
 	const [notification, setNotification] = useState(null);
 	const [openDrawer, setOpenDrawer] = useState(false);
+	const [orders, setOrders] = useState([]);
 
 	async function setWalletAddress() {
 		const wa = await getWalletAddress();
 		if (!wa || wa.length < 6) return;
 		setaddress(wa);
+		hadleGetOrders();
 	}
 
 	async function handleSwap() {
@@ -52,9 +62,19 @@ const WalletBadge = () => {
 		}
 	}
 
+	async function hadleGetOrders() {
+		const or = await getOrders(address);
+		setOrders(or);
+	}
+
+	const tokenIcons = {
+		"0xa6cd47FB9A6D7cFAA08577323f0f31Ed2b20965e": <FaEthereum />,
+		"0x0000000000000000000000000000000000000000": <FaBitcoin />,
+	};
+
 	useEffect(() => {
 		setWalletAddress();
-	}, []);
+	}, [address]);
 
 	return (
 		<div
@@ -75,7 +95,23 @@ const WalletBadge = () => {
 			)}
 			<SideDrawer isOpen={openDrawer} onClose={() => setOpenDrawer(false)}>
 				<h2>History</h2>
-				<p>This is inside the drawer.</p>
+				{orders.map((o) => {
+					return (
+						<TransactionTile
+							fromAmount={formatTokenAmount(
+								o.quote.srcTokenAmount,
+								o.quote.srcTokenAddress
+							)}
+							fromTokens={tokenIcons[o.quote.srcTokenAddress]}
+							toAmount={formatTokenAmount(
+								o.quote.dstTokenAmount,
+								o.quote.dstTokenAddress
+							)}
+							toTokens={tokenIcons[o.quote.dstTokenAddress]}
+							date="7/21/2025"
+						/>
+					);
+				})}
 			</SideDrawer>
 			<img src="./logo.png" alt="Logo" className="site-logo" />
 			<p className="faucet" onClick={handleSwap}>
