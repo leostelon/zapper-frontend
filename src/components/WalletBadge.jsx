@@ -45,6 +45,7 @@ const WalletBadge = () => {
 			return tx;
 		} catch (error) {
 			console.log(error);
+			showNotification("Swap failed", "error");
 			setSwapLoading(false);
 		}
 	}

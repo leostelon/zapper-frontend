@@ -15,6 +15,8 @@ import { useEffect } from "react";
 import { crypto as bjsCrypto } from "bitcoinjs-lib";
 import { createOrder } from "../api/order";
 import { BN } from "bn.js";
+import Notification from "./Notification";
+import Loader from "./Loader";
 
 const tokens = [
 	{
@@ -46,6 +48,8 @@ export const SwapBox = () => {
 	const [quote, setQuote] = useState(null);
 	const [sendInputAmount, setSendInputAmount] = useState(null);
 	const [sendTokenBalance, setSendTokenBalance] = useState(null);
+	const [swapLoading, setSwapLoading] = useState(false);
+	const [notification, setNotification] = useState(null);
 
 	const availableForSend = tokens.filter((t) => t.id !== receiveToken?.id);
 	const availableForReceive = tokens.filter((t) => t.id !== sendToken?.id);
@@ -113,18 +117,31 @@ export const SwapBox = () => {
 		setReceiveToken(sendToken);
 	}
 
+	const showNotification = (msg, type = "info") => {
+		setNotification({ msg, type });
+	};
+
 	async function handleSwap() {
-		if (!connectedWalletAddress) {
-			const res = await connectWalletToSite();
-			if (res) getConnectedWalletAddress();
-		} else {
-			const quote = await fetchQuote(true);
-			await checkAndApproveERC20(quote.srcTokenAmount);
-			const preimage = generateRandomHex();
-			const preimageBuffer = Buffer.from(preimage);
-			localStorage.setItem(quote._id, preimage);
-			const hash = bjsCrypto.hash160(preimageBuffer);
-			await handleCreateOrder(hash.toString("hex"), quote._id);
+		try {
+			setSwapLoading(true);
+			if (!connectedWalletAddress) {
+				const res = await connectWalletToSite();
+				if (res) getConnectedWalletAddress();
+			} else {
+				const quote = await fetchQuote(true);
+				await checkAndApproveERC20(quote.srcTokenAmount);
+				const preimage = generateRandomHex();
+				const preimageBuffer = Buffer.from(preimage);
+				localStorage.setItem(quote._id, preimage);
+				const hash = bjsCrypto.hash160(preimageBuffer);
+				await handleCreateOrder(hash.toString("hex"), quote._id);
+			}
+			showNotification("Created order🥳", "success");
+			setSwapLoading(false);
+		} catch (error) {
+			console.log(error);
+			setSwapLoading(false);
+			showNotification(error.message, "error");
 		}
 	}
 
@@ -174,6 +191,13 @@ export const SwapBox = () => {
 
 	return (
 		<div className="swap-box">
+			{notification && (
+				<Notification
+					message={notification.msg}
+					type={notification.type}
+					onClose={() => setNotification(null)}
+				/>
+			)}
 			<div className="swap-section">
 				<div className="input-container">
 					<div style={{ height: "100%" }}>
@@ -245,7 +269,7 @@ export const SwapBox = () => {
 					color: "#ffffff",
 				}}
 			>
-				{connectedWalletAddress ? "Swap" : "Connect"}
+				{connectedWalletAddress ? swapLoading ? <Loader /> : "Swap" : "Connect"}
 			</button>
 		</div>
 	);

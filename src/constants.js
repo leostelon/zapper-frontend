@@ -82,4 +82,13 @@ export const ERC20_ABI = [
 		stateMutability: "nonpayable",
 		type: "function",
 	},
+	{
+		constant: false,
+		inputs: [],
+		name: "deposit",
+		outputs: [],
+		payable: true,
+		stateMutability: "payable",
+		type: "function",
+	},
 ];
