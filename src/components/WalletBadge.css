@@ -1,15 +1,20 @@
+.nav-right {
+	display: flex;
+	gap: 12px;
+}
+
 .wallet-badge-container {
 	display: flex;
 	align-items: center;
-    justify-content: space-between;
+	justify-content: space-between;
 	gap: 12px;
 	cursor: pointer;
-    padding: 0 12px;
+	padding: 0 12px;
 }
 
 .site-logo {
-    width: 100px;
-    height: 100px;
+	width: 100px;
+	height: 100px;
 	object-fit: contain;
 }
 
@@ -42,4 +47,26 @@
 
 .faucet:hover {
 	color: #5a5aff;
+}
+
+.history-button {
+	background-color: #eaeaea; /* light greyish blue */
+	border: none;
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.history-button:hover {
+	background-color: rgb(213, 213, 213);
+}
+
+.history-button svg {
+	color: #4a3d52; /* similar to the icon color in the image */
+	font-size: 18px;
 }

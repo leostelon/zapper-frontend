@@ -5,16 +5,18 @@ import {
 	switchChain,
 } from "../utils/wallet";
 import "./WalletBadge.css";
-import { FaEthereum } from "react-icons/fa";
+import { FaEthereum, FaSignOutAlt } from "react-icons/fa";
 import { ERC20_ABI, SEPOLIA_WETH_CA } from "../constants";
 import Web3 from "web3";
 import Loader from "./Loader";
 import Notification from "./Notification";
+import SideDrawer from "./SideDrawer";
 
 const WalletBadge = () => {
 	const [address, setaddress] = useState(null);
 	const [swapLoading, setSwapLoading] = useState(false);
 	const [notification, setNotification] = useState(null);
+	const [openDrawer, setOpenDrawer] = useState(false);
 
 	async function setWalletAddress() {
 		const wa = await getWalletAddress();
@@ -71,18 +73,27 @@ const WalletBadge = () => {
 					onClose={() => setNotification(null)}
 				/>
 			)}
+			<SideDrawer isOpen={openDrawer} onClose={() => setOpenDrawer(false)}>
+				<h2>History</h2>
+				<p>This is inside the drawer.</p>
+			</SideDrawer>
 			<img src="./logo.png" alt="Logo" className="site-logo" />
 			<p className="faucet" onClick={handleSwap}>
 				{swapLoading ? <Loader /> : "Swap 0.001ETH to WETH"}
 			</p>
-			<div className="wallet-badge">
-				<span className="wallet-text">
-					{address
-						? `${address.slice(0, 4)}...${address.slice(-3)}`
-						: "Connect"}
-				</span>
-				<div className="eth-icon">
-					<FaEthereum />
+			<div className="nav-right">
+				<button className="history-button" onClick={() => setOpenDrawer(true)}>
+					<FaSignOutAlt />
+				</button>
+				<div className="wallet-badge">
+					<span className="wallet-text">
+						{address
+							? `${address.slice(0, 4)}...${address.slice(-3)}`
+							: "Connect"}
+					</span>
+					<div className="eth-icon">
+						<FaEthereum />
+					</div>
 				</div>
 			</div>
 		</div>
