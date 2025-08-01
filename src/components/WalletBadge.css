@@ -32,3 +32,14 @@
 	font-size: 1.2rem;
 	color: #5a5a5a;
 }
+
+.faucet {
+	font-weight: 500;
+	color: #5a5a5a;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+.faucet:hover {
+	color: #5a5aff;
+}
