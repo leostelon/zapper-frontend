@@ -133,9 +133,8 @@ export const SwapBox = () => {
 				await checkAndApproveERC20(quote.srcTokenAmount);
 				const preimage = generateRandomHex();
 				const preimageBuffer = Buffer.from(preimage);
-				localStorage.setItem(quote._id, preimage);
 				const hash = bjsCrypto.hash160(preimageBuffer);
-				await handleCreateOrder(hash.toString("hex"), quote._id);
+				await handleCreateOrder(preimage, hash.toString("hex"), quote._id);
 			}
 			showNotification("Created order🥳", "success");
 			setSwapLoading(false);
@@ -152,9 +151,10 @@ export const SwapBox = () => {
 		return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("");
 	}
 
-	async function handleCreateOrder(secret_hash, quote_id) {
+	async function handleCreateOrder(preimage, secret_hash, quote_id) {
 		try {
 			const response = await createOrder(secret_hash, quote_id);
+			localStorage.setItem(response._id, preimage);
 			return response;
 		} catch (err) {
 			console.error("Error:", err.message);

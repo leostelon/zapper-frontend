@@ -5,20 +5,16 @@ import {
 	switchChain,
 } from "../utils/wallet";
 import "./WalletBadge.css";
-import {
-	FaBitcoin,
-	FaDollarSign,
-	FaEthereum,
-	FaSignOutAlt,
-} from "react-icons/fa";
+import { FaBitcoin, FaEthereum, FaSignOutAlt } from "react-icons/fa";
 import { ERC20_ABI, SEPOLIA_WETH_CA } from "../constants";
 import Web3 from "web3";
 import Loader from "./Loader";
 import Notification from "./Notification";
 import SideDrawer from "./SideDrawer";
 import TransactionTile from "./TransactionTile";
-import { getOrders } from "../api/order";
+import { getOrder, getOrders, redeemOrder } from "../api/order";
 import { formatTokenAmount } from "../utils/formatTokenAmount";
+import { getLastElement } from "../utils/getLastElement";
 
 const WalletBadge = () => {
 	const [address, setaddress] = useState(null);
@@ -26,6 +22,7 @@ const WalletBadge = () => {
 	const [notification, setNotification] = useState(null);
 	const [openDrawer, setOpenDrawer] = useState(false);
 	const [orders, setOrders] = useState([]);
+	let redeemInterval;
 
 	async function setWalletAddress() {
 		const wa = await getWalletAddress();
@@ -64,7 +61,33 @@ const WalletBadge = () => {
 
 	async function hadleGetOrders() {
 		const or = await getOrders(address);
+		redeemInterval = setInterval(() => {
+			if (or.length > 0) redeemDeposit(or[0]._id);
+		}, 3000);
 		setOrders(or);
+	}
+
+	async function redeemDeposit(orderId) {
+		try {
+			const order = await getOrder(orderId);
+			if (
+				getLastElement(order.src_status) === "DEPOSIT_COMPLETE" &&
+				getLastElement(order.dst_status) === "DEPOSIT_COMPLETE"
+			) {
+				const secret = localStorage.getItem(orderId);
+				await redeemOrder(orderId, secret, address);
+				showNotification("Swap completed 🥳", "success");
+				clearInterval(redeemInterval);
+			} else if (
+				order.src_status.includes("WITHDRAWN") &&
+				order.dst_status.includes("WITHDRAWN")
+			) {
+				clearInterval(redeemInterval);
+			}
+		} catch (error) {
+			console.log(error);
+			showNotification("Error redeeming order", "error");
+		}
 	}
 
 	const tokenIcons = {

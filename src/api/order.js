@@ -29,7 +29,30 @@ export async function createOrder(secret_hash, quote_id) {
 
 export async function getOrders(walletAddress) {
 	try {
-		const response = await fetch(`${API_BASE_URL}/order/wallet/${walletAddress}`, {
+		const response = await fetch(
+			`${API_BASE_URL}/order/wallet/${walletAddress}`,
+			{
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			}
+		);
+		if (!response.ok) {
+			const error = await response.json();
+			throw new Error(error.message || "Failed to fetch orders");
+		}
+
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		throw new Error(error?.response?.data?.message || "Failed to fetch orders");
+	}
+}
+
+export async function getOrder(orderId) {
+	try {
+		const response = await fetch(`${API_BASE_URL}/order/${orderId}`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
@@ -44,5 +67,31 @@ export async function getOrders(walletAddress) {
 		return data;
 	} catch (error) {
 		throw new Error(error?.response?.data?.message || "Failed to fetch orders");
+	}
+}
+
+export async function redeemOrder(order_id, secret, withdraw_to) {
+	try {
+		const response = await fetch(`${API_BASE_URL}/order/redeem`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				order_id,
+				secret,
+				withdraw_to,
+			}),
+		});
+		if (!response.ok) {
+			const error = await response.json();
+			throw new Error(error.message || "Failed to create order");
+		}
+
+		const data = await response.json();
+		console.log("Order created:", data);
+		return data;
+	} catch (error) {
+		throw new Error(error?.response?.data?.message || "Failed to get quote");
 	}
 }

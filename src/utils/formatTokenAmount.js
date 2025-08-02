@@ -8,7 +8,6 @@ const tokenDecimals = {
 export function formatTokenAmount(input, tokenAddress) {
 	if (!input) return "0";
 	const tD = tokenDecimals[tokenAddress];
-	console.log(tD);
 	const amount = Web3.utils.fromWei(input, tD);
 	const num = parseFloat(amount);
 	if (isNaN(num)) return "0";
