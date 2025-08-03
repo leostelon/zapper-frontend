@@ -5,7 +5,7 @@ import {
 	switchChain,
 } from "../utils/wallet";
 import "./WalletBadge.css";
-import { FaBitcoin, FaEthereum, FaSignOutAlt } from "react-icons/fa";
+import { FaBitcoin, FaEthereum, FaHistory, FaSignOutAlt } from "react-icons/fa";
 import { ERC20_ABI, SEPOLIA_WETH_CA } from "../constants";
 import Web3 from "web3";
 import Loader from "./Loader";
@@ -142,7 +142,7 @@ const WalletBadge = () => {
 			</p>
 			<div className="nav-right">
 				<button className="history-button" onClick={() => setOpenDrawer(true)}>
-					<FaSignOutAlt />
+					<FaHistory />
 				</button>
 				<div className="wallet-badge">
 					<span className="wallet-text">

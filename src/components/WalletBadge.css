@@ -21,7 +21,7 @@
 .wallet-badge {
 	display: flex;
 	align-items: center;
-	background-color: #f2f2f2;
+	background-color: #fff3e0;
 	padding: 8px 12px;
 	border-radius: 12px;
 	gap: 8px;
@@ -50,7 +50,7 @@
 }
 
 .history-button {
-	background-color: #eaeaea; /* light greyish blue */
+	background-color: #fff3e0; /* light greyish blue */
 	border: none;
 	border-radius: 50%;
 	width: 40px;
@@ -63,7 +63,7 @@
 }
 
 .history-button:hover {
-	background-color: rgb(213, 213, 213);
+	background-color: #fff7ea;
 }
 
 .history-button svg {

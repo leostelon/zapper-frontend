@@ -16,7 +16,7 @@ const TokenSelector = ({ selected, onSelect, exclude, tokens }) => {
 						{selected.token.icon} {selected.token.symbol}
 					</>
 				) : (
-					"Select Token ⬇"
+					"Select Token"
 				)}
 			</div>
 

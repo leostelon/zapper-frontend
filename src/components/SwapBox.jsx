@@ -257,7 +257,7 @@ export const SwapBox = () => {
 				className="swap-button"
 				onClick={handleSwap}
 				style={{
-					backgroundColor: quote ? "#7979f6ff" : "#e2e2f4",
+					backgroundColor: quote ? "#e14f79" : "#fc7ba0ff",
 					color: "#ffffff",
 				}}
 			>
