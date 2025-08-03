@@ -2,7 +2,11 @@ import "./SwapBox.css";
 import { FaBitcoin, FaEthereum, FaExchangeAlt, FaWallet } from "react-icons/fa";
 import TokenSelector from "./TokenSelector";
 import { useState } from "react";
-import { connectWalletToSite, getWalletAddress } from "../utils/wallet";
+import {
+	connectWalletToSite,
+	getWalletAddress,
+	switchChain,
+} from "../utils/wallet";
 import { getQuote } from "../api/quote";
 import Web3 from "web3";
 import {
@@ -81,6 +85,7 @@ export const SwapBox = () => {
 	}
 
 	async function getConnectedWalletAddress() {
+		await switchChain();
 		const wa = await getWalletAddress();
 		if (wa) {
 			setConnectedWalletAddress(wa);
